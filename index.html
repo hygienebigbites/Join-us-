@@ -1,0 +1,1162 @@
+x  <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>AddaMithra – IndiaJobAdda AI Chat</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#075E54">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<style>
+  .action-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .action-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: #fff;
+    border: 1px solid #eee;
+    padding: 4px 8px;
+    border-radius: 14px;
+    font-size: 11.5px;
+    cursor: pointer;
+    text-decoration: none;
+    color: #333;
+  }
+
+  .action-btn img {
+    width: 12px !important;
+    height: 12px !important;
+    object-fit: contain;
+    display: inline-block;
+  }
+
+  .action-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .action-btn {
+    line-height: 1;
+  }
+
+  .action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 7px;
+    font-size: 11px;
+    border-radius: 12px;
+    line-height: 1;
+    height: 22px;             /* 🔥 force small height */
+  }
+
+  .action-btn img {
+    width: 11px !important;
+    height: 11px !important;
+    min-width: 11px;
+  }
+
+  .action-btns {
+    font-size: 0;   /* 🔥 resets inherited size */
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --wa-dark-green: #075E54;
+    --wa-mid-green: #128C7E;
+    --wa-bright-green: #25D366;
+    --wa-light-green: #DCF8C6;
+    --wa-bg: #ECE5DD;
+    --wa-white: #FFFFFF;
+    --wa-gray: #F0F0F0;
+    --wa-text: #1a1a1a;
+    --wa-muted: #667781;
+    --wa-blue-tick: #34B7F1;
+    --wa-header-height: 58px;
+    --wa-footer-height: 62px;
+  }
+
+  html, body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    background: #111;
+  }
+
+  /* ── Layout ── */
+  #app {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    max-width: 480px;
+    margin: 0 auto;
+    background: var(--wa-bg);
+    position: relative;
+  }
+
+  /* ── Header ── */
+  #header {
+    background: var(--wa-dark-green);
+    color: #fff;
+    padding: 0 14px;
+    height: var(--wa-header-height);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: absolute; /* Lock it to the top of the app container */
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  }
+
+  #back-btn {
+    background: none; border: none; cursor: pointer;
+    color: #fff; padding: 4px; display: flex; align-items: center;
+    margin-right: 2px;
+  }
+
+  #avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--wa-bright-green);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 15px; color: #fff;
+    flex-shrink: 0; cursor: pointer;
+    border: 2px solid rgba(255,255,255,0.3);
+  }
+
+  #header-info { flex: 1; overflow: hidden; cursor: pointer; }
+  #header-name { font-size: 15.5px; font-weight: 600; letter-spacing: 0.1px; }
+  #header-status { font-size: 12px; color: #b2dfdb; margin-top: 1px; }
+
+  #header-icons { display: flex; gap: 18px; }
+  #header-icons button {
+    background: none; border: none; cursor: pointer; color: #fff;
+    padding: 4px; display: flex; align-items: center;
+  }
+
+  /* ── Chat Background ── */
+  #chat-bg {margin-top: var(--wa-header-height); /* Add this line */
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 8px 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    background-color: var(--wa-bg);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cdefs%3E%3Cpattern id='p' width='80' height='80' patternUnits='userSpaceOnUse'%3E%3Ccircle cx='40' cy='40' r='1.5' fill='%23c8bdb0' opacity='0.4'/%3E%3Ccircle cx='10' cy='10' r='1' fill='%23c8bdb0' opacity='0.3'/%3E%3Ccircle cx='70' cy='10' r='1' fill='%23c8bdb0' opacity='0.3'/%3E%3Ccircle cx='10' cy='70' r='1' fill='%23c8bdb0' opacity='0.3'/%3E%3Ccircle cx='70' cy='70' r='1' fill='%23c8bdb0' opacity='0.3'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='400' height='400' fill='url(%23p)'/%3E%3C/svg%3E");
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+
+  /* ── Date Label ── */
+  .date-chip {
+    align-self: center;
+    background: rgba(255,255,255,0.75);
+    color: #54656f;
+    font-size: 12px;
+    padding: 4px 14px;
+    border-radius: 12px;
+    margin: 8px 0 4px;
+    backdrop-filter: blur(4px);
+    font-weight: 500;
+  }
+
+  /* ── Bubble Rows ── */
+  .row { display: flex; align-items: flex-end; gap: 4px; margin: 1px 0; }
+  .row.user { justify-content: flex-end; padding-left: 50px; }
+  .row.bot { justify-content: flex-start; padding-right: 50px; }
+
+  .bot-av {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--wa-bright-green);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #fff;
+    flex-shrink: 0; align-self: flex-end; margin-bottom: 2px;
+  }
+
+  /* ── Bubbles ── */
+  .bubble {
+    max-width: 100%;
+    padding: 7px 10px 5px 10px;
+    font-size: 14.5px;
+    line-height: 1.55;
+    word-break: break-word;
+    position: relative;
+    animation: popIn 0.18s ease-out both;
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.92) translateY(4px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .bubble.user {
+    background: var(--wa-light-green);
+    color: var(--wa-text);
+    border-radius: 8px 0px 8px 8px;
+  }
+
+  .bubble.user::after {
+    content: '';
+    position: absolute;
+    top: 0; right: -7px;
+    border-width: 8px 0 0 8px;
+    border-style: solid;
+    border-color: var(--wa-light-green) transparent transparent transparent;
+  }
+
+  .bubble.bot {
+    background: var(--wa-white);
+    color: var(--wa-text);
+    border-radius: 0px 8px 8px 8px;
+  }
+
+  .bubble.bot::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -7px;
+    border-width: 8px 8px 0 0;
+    border-style: solid;
+    border-color: var(--wa-white) transparent transparent transparent;
+  }
+
+  /* ── Bubble Meta ── */
+  .meta {
+    display: flex; align-items: center; justify-content: flex-end;
+    gap: 3px; margin-top: 3px; float: right; margin-left: 8px;
+  }
+  .meta-time { font-size: 11px; color: var(--wa-muted); }
+  .meta-tick { font-size: 13px; color: var(--wa-blue-tick); line-height: 1; }
+
+  /* ── Typing ── */
+  .typing-bub {
+    background: var(--wa-white);
+    border-radius: 0px 8px 8px 8px;
+    padding: 10px 14px;
+    display: flex; gap: 5px; align-items: center;
+  }
+  .typing-bub::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -7px;
+    border-width: 8px 8px 0 0;
+    border-style: solid;
+    border-color: var(--wa-white) transparent transparent transparent;
+  }
+  .typing-bub span {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #aaa;
+    animation: bounce 1.3s infinite;
+    display: inline-block;
+  }
+  .typing-bub span:nth-child(2) { animation-delay: 0.18s; }
+  .typing-bub span:nth-child(3) { animation-delay: 0.36s; }
+
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); background: #aaa; }
+    30% { transform: translateY(-6px); background: #777; }
+  }
+
+  /* ── Footer ── */
+  #footer {
+    background: var(--wa-gray);
+    padding: 8px 10px;
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+    min-height: var(--wa-footer-height);
+    border-top: 0.5px solid #ddd;
+  }
+
+  .foot-icon {
+    width: 38px; height: 38px;
+    background: none; border: none;
+    cursor: pointer; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--wa-muted); transition: background 0.15s;
+    flex-shrink: 0;
+  }
+  .foot-icon:hover { background: #ddd; }
+
+  #input-wrap {
+    flex: 1;
+    background: var(--wa-white);
+    border-radius: 22px;
+    display: flex;
+    align-items: flex-end;
+    padding: 8px 14px;
+    min-height: 40px;
+    max-height: 120px;
+    overflow: hidden;
+    border: none;
+  }
+
+  #msg {
+    flex: 1;
+    border: none; outline: none;
+    resize: none;
+    font-size: 15px;
+    font-family: inherit;
+    line-height: 1.5;
+    background: transparent;
+    color: var(--wa-text);
+    max-height: 96px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  #msg::placeholder { color: #aaa; }
+
+  #send-btn {
+    width: 46px; height: 46px;
+    background: var(--wa-bright-green);
+    border: none; border-radius: 50%;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s, transform 0.1s;
+    box-shadow: 0 2px 6px rgba(37,211,102,0.4);
+  }
+  #send-btn:hover { background: #22c35e; }
+  #send-btn:active { transform: scale(0.94); }
+
+  /* ── Quick Reply Chips ── */
+  #quick-replies {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    padding: 6px 10px 2px;
+    flex-shrink: 0;
+  }
+  .chip {
+    background: #fff;
+    border: 1px solid #c8e6c9;
+    color: var(--wa-mid-green);
+    font-size: 13px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s, border-color 0.15s;
+    white-space: nowrap;
+  }
+  .menu-item {
+  padding: 12px 14px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.menu-item:hover {
+  background: #f2f2f2;
+}
+  .chip:hover { background: #e8f5e9; border-color: var(--wa-bright-green); }
+
+  /* ── Scroll to Bottom ── */
+  #scroll-down {
+    position: absolute;
+    bottom: 72px; right: 14px;
+    width: 36px; height: 36px;
+    background: var(--wa-white);
+    border: none; border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    cursor: pointer;
+    display: none;
+    align-items: center; justify-content: center;
+    color: var(--wa-muted);
+    z-index: 5;
+  }
+  #scroll-down.show { display: flex; }
+
+  /* ── Unread badge on scroll btn ── */
+  #unread-count {
+    position: absolute;
+    top: -5px; right: -5px;
+    background: var(--wa-bright-green);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    display: none;
+    align-items: center; justify-content: center;
+  }
+  #unread-count.show { display: flex; }
+
+  /* ── Toast ── */
+  #toast {
+    position: absolute;
+    top: 70px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,0.7);
+    color: #fff; font-size: 13px;
+    padding: 7px 18px;
+    border-radius: 20px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 20;
+    white-space: nowrap;
+  }
+  #toast.show { opacity: 1; }
+
+  /* ── Scrollbar (desktop) ── */
+  #chat-bg::-webkit-scrollbar { width: 4px; }
+  #chat-bg::-webkit-scrollbar-track { background: transparent; }
+  #chat-bg::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.18); border-radius: 4px; }
+
+  /* ── FAQ Dropdown styling ── */
+
+  #faq-dropdown {
+    flex: 1;
+    border: 2px solid #25D366; /* Bright Green border */
+    outline: none;
+    background: #fff9c4;       /* Eye-catching yellow background */
+    font-size: 15px;
+    font-family: inherit;
+    color: #1a1a1a;
+    width: 100%;
+    display: none;             /* Hidden initially */
+    border-radius: 12px;
+    padding: 5px;
+    font-weight: 600;
+    transition: transform 0.2s;
+  }
+
+  /* The Zoom Animation */
+  @keyframes eyeCatcher {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.04); background: #fff176; }
+    100% { transform: scale(1); }
+  }
+
+  .pulse-animation {
+    animation: eyeCatcher 1s ease-in-out infinite;
+  }
+
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <div id="header">
+    <button id="back-btn" onclick="history.back()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    </button>
+    <div id="avatar">AI</div>
+    <div id="header-info">
+      <div id="header-name">AddaMithra AI</div>
+      <div id="header-status">online</div>
+    </div>
+    <div id="header-icons">
+
+  <button title="Call" onclick="window.location.href='tel:+918040092083'">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+      <path d="M6.62 10.79a15.054 15.054 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1v3.5a1 1 0 01-1 1C10.85 22 2 13.15 2 2a1 1 0 011-1H6.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/>
+    </svg>
+  </button>
+
+  <div style="position: relative;">
+
+    <button onclick="toggleMenu()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+        <circle cx="12" cy="5" r="2"/>
+        <circle cx="12" cy="12" r="2"/>
+        <circle cx="12" cy="19" r="2"/>
+      </svg>
+    </button>
+
+    <div id="menu" style="
+      display:none;
+      position:absolute;
+      right:0;
+      top:40px;
+      background:white;
+      color:black;
+      border-radius:8px;
+      width:220px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.2);
+      overflow:hidden;
+      z-index:100;
+    ">
+
+      <div class="menu-item" onclick="shareApp()">
+  🔗 Share
+</div>
+
+<div class="menu-item" onclick="openLink('https://www.instagram.com/india_jobadda?utm_source=qr&igsh=MThmbmQyOXlkdTljZQ==')">
+  <img src="https://cdn-icons-png.flaticon.com/128/2111/2111463.png" width="14" style="margin-right:10px;">
+  Instagram
+</div>
+
+<div class="menu-item" onclick="openLink('https://www.facebook.com/share/1Aynw5Xgtz/')">
+  <img src="https://cdn-icons-png.flaticon.com/128/733/733547.png" width="14" style="margin-right:10px;">
+  Facebook
+</div>
+
+<div class="menu-item" onclick="openLink('https://wa.me/919739961735')">
+  <img src="https://cdn-icons-png.flaticon.com/128/733/733585.png" width="14" style="margin-right:10px;">
+  Chat with HR
+</div>
+
+<div class="menu-item" onclick="openLink('https://whatsapp.com/channel/0029VbCLkqcAYlUNzgaSIO2a')">
+  <img src="https://cdn-icons-png.flaticon.com/128/733/733585.png" width="14" style="margin-right:10px;">
+  WhatsApp Channel
+</div>
+    </div>
+
+  </div>
+
+</div>
+  </div>
+
+  <div id="chat-bg">
+    <div class="date-chip" id="date-chip"></div>
+
+    <div class="row bot">
+      <div class="bot-av">AI</div>
+      <div class="bubble bot">
+        Namaste! 🙏 Welcome to <strong>IndiaJobAdda</strong>.<br><br>
+        Which language would you like to chat in?<br>
+               <div class="meta">
+          <span class="meta-time" id="welcome-time"></span>
+        </div>
+      </div>
+    </div>
+
+    <div id="quick-replies" style="padding-left: 36px; padding-top: 4px;">
+      <button class="chip" onclick="sendChip('English')">English</button>
+      <button class="chip" onclick="sendChip('हिंदी')">हिंदी</button>
+      <button class="chip" onclick="sendChip('ಕನ್ನಡ')">ಕನ್ನಡ</button>
+      <button class="chip" onclick="sendChip('తెలుగు')">తెలుగు</button>
+      <button class="chip" onclick="sendChip('தமிழ்')">தமிழ்</button>
+      <button class="chip" onclick="sendChip('മലയാളം')">മലയാളം</button>
+    </div>
+  </div>
+
+  <button id="scroll-down" onclick="scrollToBottom()">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+    <span id="unread-count"></span>
+  </button>
+
+  <div id="toast"></div>
+
+  <div id="footer">
+    <button class="foot-icon" title="Emoji" onclick="showToast('Emoji picker coming soon!')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>
+      </svg>
+    </button>
+    
+    <div id="input-wrap">
+      <textarea id="msg" rows="1" placeholder="Type a message" autocomplete="off" autocorrect="on" spellcheck="true"></textarea>
+      
+      <select id="faq-dropdown">
+        <option value="" disabled selected>Select a Question...</option>
+        <option value="Whrere is my JoB location?">Whrere is my JoB location?</option>
+        <option value="What is the Job roll available now?">What is the Job roll available now?</option>
+        <option value="What will be the salary ?">What will be the salary ?</option>
+        <option value="Is there an incentive">Is there an incentive</option>
+        <option value="How do i earn my referal bonus">How do i earn my referal bonus</option>
+        <option value="Is there a travell allowance for Joining">Is there a travell allowance for Joining</option>
+        <option value="How do i reach HR">How do i reach HR</option>
+        <option value="What is the minimum education required ?">What is the minimum education required ?</option>
+        <option value="Is English knowlege is mandate ?">Is English knowlege is mandate ?</option>
+        <option value="Where is the Office ?">Where is the Office ?</option>
+        <option value="How is my carrier growth with India Job adda">How is my carrier growth with India Job adda</option>
+      </select>
+    </div>
+
+    <button class="foot-icon" title="Attach" onclick="showToast('Attachment coming soon!')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 0 1 5 0v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5a2.5 2.5 0 0 0 5 0V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"/>
+      </svg>
+    </button>
+    <button id="send-btn" title="Send">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+
+</div>
+
+<script>
+const chatBg = document.getElementById('chat-bg');
+const msgInput = document.getElementById('msg');
+const statusEl = document.getElementById('header-status');
+const scrollDownBtn = document.getElementById('scroll-down');
+const sendBtn = document.getElementById('send-btn');
+const unreadBadge = document.getElementById('unread-count');
+let history = [];
+let unreadCount = 0;
+let isAtBottom = true;
+let currentLang = 'en'; 
+let t = {}; 
+
+// 🌍 FULL TRANSLATION DICTIONARY (WITH ALL 11 FAQS)
+const translations = {
+  en: {
+    welcome: "I'm **AddaMithra**, your job assistant. I can help you find jobs and apply easily. 😊\n\nWhat is your name?",
+    askPhone: "Nice to meet you {name} 😊\n\n📱 Please share your 10-digit mobile number.",
+    errPhone: "❌ Please enter a valid 10-digit number",
+    askPin: "📍 Please share your 6-digit Area PIN code",
+    errPin: "❌ Enter a valid PIN code",
+    pinSuccess: "📍 {district}, {state}",
+    askJob: "💼 What type of job are you looking for?",
+    askCity: "📍 Where do you want to work?",
+    askExp: "💼 Do you have any experience?",
+    askEdu: "🎓 What is your education?",
+    summary: "✅ **Details Summary**\n\n👤 {name}\n📱 {phone}\n📍 {district}, {state}\n\n💼 {job}\n🏙 {city}\n📊 {exp}\n🎓 {edu}",
+    faqPlaceholder: "Select a Question...",
+    faqs: [
+      { q: "Where is my Job location?", a: "Your location is based on your pin code! 📍" },
+      { q: "What is the Job role available now?", a: "We have openings in Delivery, BPO, Kitchen, and Helper roles! 💼" },
+      { q: "What will be the salary?", a: "Salaries usually range from ₹15,000 to ₹30,000 per month based on the role. 💰" },
+      { q: "Is there an incentive?", a: "Yes, many roles offer daily/weekly performance incentives! 📈" },
+      { q: "How do I earn my referral bonus?", a: "When your friend joins and completes 15 days of work, you get your bonus! 🤝" },
+      { q: "Is there a travel allowance for Joining?", a: "This depends on the company hiring you, HR will confirm! 🚆" },
+      { q: "How do I reach HR?", a: "Click the WhatsApp or Call buttons below to reach us instantly! 👇" },
+      { q: "What is the minimum education required?", a: "We have jobs for below 10th, 10th, 12th, and Graduates! 🎓" },
+      { q: "Is English knowledge mandate?", a: "Not for all! Delivery and Helper roles just need the local language. 🗣️" },
+      { q: "Where is the Office?", a: "Our main office is in Bengaluru, but joining locations depend on the company. 🏢" },
+      { q: "How is my career growth with India Job adda?", a: "Excellent! Many candidates become team leads within 6-12 months! 🚀" }
+    ]
+  },
+  hi: {
+    welcome: "मैं **AddaMithra** हूँ, आपका जॉब असिस्टेंट। मैं जॉब ढूंढने में आपकी मदद करूँगा। 😊\n\nआपका नाम क्या है?",
+    askPhone: "आपसे मिलकर अच्छा लगा {name} 😊\n\n📱 कृपया अपना 10-अंकों का मोबाइल नंबर दर्ज करें।",
+    errPhone: "❌ कृपया मान्य 10-अंकों का नंबर दर्ज करें",
+    askPin: "📍 अपना 6-अंकों का पिन कोड बताएं",
+    errPin: "❌ अमान्य पिन कोड",
+    pinSuccess: "📍 {district}, {state}",
+    askJob: "💼 आप किस प्रकार की जॉब ढूंढ रहे हैं?",
+    askCity: "📍 आप कहाँ काम करना चाहते हैं?",
+    askExp: "💼 क्या आपके पास कोई कार्य अनुभव है?",
+    askEdu: "🎓 आपकी शैक्षणिक योग्यता क्या है?",
+    summary: "✅ **विवरण (Summary)**\n\n👤 {name}\n📱 {phone}\n📍 {district}, {state}\n\n💼 {job}\n🏙 {city}\n📊 {exp}\n🎓 {edu}",
+    faqPlaceholder: "एक प्रश्न चुनें...",
+    faqs: [
+      { q: "मेरी जॉब लोकेशन कहाँ होगी?", a: "आपकी लोकेशन आपके पिन कोड के आधार पर तय की जाएगी! 📍" },
+      { q: "अभी कौन सी जॉब उपलब्ध हैं?", a: "हमारे पास डिलीवरी, BPO, किचन और हेल्पर की जॉब्स हैं! 💼" },
+      { q: "सैलरी कितनी होगी?", a: "सैलरी आमतौर पर भूमिका के आधार पर ₹15,000 से ₹30,000 प्रति माह होती है। 💰" },
+      { q: "क्या कोई इंसेंटिव (Incentive) है?", a: "हाँ, कई नौकरियों में प्रदर्शन के आधार पर इंसेंटिव मिलता है! 📈" },
+      { q: "मैं अपना रेफरल बोनस कैसे कमा सकता हूँ?", a: "जब आपका दोस्त ज्वाइन करेगा और 15 दिन काम करेगा, तब आपको बोनस मिलेगा! 🤝" },
+      { q: "क्या ज्वाइनिंग के लिए ट्रैवल अलाउंस मिलेगा?", a: "यह हायर करने वाली कंपनी पर निर्भर करता है, HR कन्फर्म करेंगे! 🚆" },
+      { q: "मैं HR से कैसे संपर्क करूं?", a: "हमसे संपर्क करने के लिए नीचे दिए गए WhatsApp या Call बटन पर क्लिक करें! 👇" },
+      { q: "न्यूनतम शिक्षा क्या चाहिए?", a: "हमारे पास 10वीं से कम, 10वीं, 12वीं और ग्रेजुएट्स के लिए नौकरियां हैं! 🎓" },
+      { q: "क्या अंग्रेजी जानना जरूरी है?", a: "सबके लिए नहीं! डिलीवरी और हेल्पर के लिए सिर्फ स्थानीय भाषा चाहिए। 🗣️" },
+      { q: "ऑफिस कहाँ है?", a: "हमारा मुख्य कार्यालय बेंगलुरु में है, लेकिन आपकी जॉब लोकेशन कंपनी पर निर्भर करेगी। 🏢" },
+      { q: "India Job Adda के साथ मेरा करियर ग्रोथ कैसा रहेगा?", a: "बहुत बढ़िया! कई उम्मीदवार 6-12 महीनों के भीतर टीम लीड बन जाते हैं! 🚀" }
+    ]
+  },
+  kn: {
+    welcome: "ನಾನು **AddaMithra**, ನಿಮ್ಮ ಉದ್ಯೋಗ ಸಹಾಯಕ. ಉದ್ಯೋಗ ಹುಡುಕಲು ನಾನು ಸಹಾಯ ಮಾಡುತ್ತೇನೆ. 😊\n\nನಿಮ್ಮ ಹೆಸರೇನು?",
+    askPhone: "ನಿಮ್ಮನ್ನು ಭೇಟಿಯಾಗಲು ಸಂತೋಷವಾಗಿದೆ {name} 😊\n\n📱 ದಯವಿಟ್ಟು ನಿಮ್ಮ 10-ಅಂಕಿಯ ಮೊಬೈಲ್ ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ.",
+    errPhone: "❌ ದಯವಿಟ್ಟು ಸರಿಯಾದ 10-ಅಂಕಿಯ ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ",
+    askPin: "📍 ದಯವಿಟ್ಟು ನಿಮ್ಮ 6-ಅಂಕಿಯ ಪಿನ್ ಕೋಡ್ ನಮೂದಿಸಿ",
+    errPin: "❌ ಸರಿಯಾದ ಪಿನ್ ಕೋಡ್ ನಮೂದಿಸಿ",
+    pinSuccess: "📍 {district}, {state}",
+    askJob: "💼 ನೀವು ಯಾವ ರೀತಿಯ ಕೆಲಸವನ್ನು ಹುಡುಕುತ್ತಿದ್ದೀರಿ?",
+    askCity: "📍 ನೀವು ಎಲ್ಲಿ ಕೆಲಸ ಮಾಡಲು ಬಯಸುತ್ತೀರಿ?",
+    askExp: "💼 ನಿಮಗೆ ಯಾವುದೇ ಕೆಲಸದ ಅನುಭವವಿದೆಯೇ?",
+    askEdu: "🎓 ನಿಮ್ಮ ಶಿಕ್ಷಣವೇನು?",
+    summary: "✅ **ವಿವರಗಳು (Summary)**\n\n👤 {name}\n📱 {phone}\n📍 {district}, {state}\n\n💼 {job}\n🏙 {city}\n📊 {exp}\n🎓 {edu}",
+    faqPlaceholder: "ಒಂದು ಪ್ರಶ್ನೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ...",
+    faqs: [
+      { q: "ನನ್ನ ಕೆಲಸದ ಸ್ಥಳ ಎಲ್ಲಿದೆ?", a: "ನಿಮ್ಮ ಪಿನ್ ಕೋಡ್ ಆಧಾರದ ಮೇಲೆ ಸ್ಥಳವನ್ನು ನಿಗದಿಪಡಿಸಲಾಗುತ್ತದೆ! 📍" },
+      { q: "ಯಾವ ಕೆಲಸಗಳು ಲಭ್ಯವಿದೆ?", a: "ಡೆಲಿವರಿ, BPO, ಅಡುಗೆಮನೆ ಮತ್ತು ಸಹಾಯಕ ಪಾತ್ರಗಳಲ್ಲಿ ಉದ್ಯೋಗಗಳಿವೆ! 💼" },
+      { q: "ಸಂಬಳ ಎಷ್ಟು ಇರುತ್ತದೆ?", a: "ಸಂಬಳವು ಪಾತ್ರವನ್ನು ಆಧರಿಸಿ ತಿಂಗಳಿಗೆ ₹15,000 ದಿಂದ ₹30,000 ವರೆಗೆ ಇರುತ್ತದೆ. 💰" },
+      { q: "ಇನ್ಸೆಂಟಿವ್ (Incentive) ಇದೆಯೇ?", a: "ಹೌದು, ಅನೇಕ ಕೆಲಸಗಳಲ್ಲಿ ಕಾರ್ಯಕ್ಷಮತೆ ಆಧಾರಿತ ಇನ್ಸೆಂಟಿವ್ ಇರುತ್ತದೆ! 📈" },
+      { q: "ನನ್ನ ರೆಫರಲ್ ಬೋನಸ್ ಪಡೆಯುವುದು ಹೇಗೆ?", a: "ನಿಮ್ಮ ಸ್ನೇಹಿತ ಸೇರಿ 15 ದಿನಗಳ ಕೆಲಸ ಮುಗಿಸಿದ ನಂತರ, ನಿಮಗೆ ಬೋನಸ್ ಸಿಗುತ್ತದೆ! 🤝" },
+      { q: "ಸೇರಲು ಪ್ರಯಾಣ ಭತ್ಯೆ (Travel allowance) ಇದೆಯೇ?", a: "ಇದು ಕಂಪನಿಯನ್ನು ಅವಲಂಬಿಸಿದೆ, HR ಖಚಿತಪಡಿಸುತ್ತಾರೆ! 🚆" },
+      { q: "HR ಅನ್ನು ತಲುಪುವುದು ಹೇಗೆ?", a: "ತಕ್ಷಣ ನಮ್ಮನ್ನು ತಲುಪಲು ಕೆಳಗಿನ WhatsApp ಅಥವಾ Call ಬಟನ್ ಕ್ಲಿಕ್ ಮಾಡಿ! 👇" },
+      { q: "ಕನಿಷ್ಠ ಶಿಕ್ಷಣ ಏನು ಬೇಕು?", a: "10ನೇ ತರಗತಿಗಿಂತ ಕಡಿಮೆ, 10ನೇ, 12ನೇ ಮತ್ತು ಪದವೀಧರರಿಗೆ ಉದ್ಯೋಗಗಳಿವೆ! 🎓" },
+      { q: "ಇಂಗ್ಲಿಷ್ ಜ್ಞಾನ ಕಡ್ಡಾಯವೇ?", a: "ಎಲ್ಲರಿಗೂ ಅಲ್ಲ! ಡೆಲಿವರಿ ಮತ್ತು ಹೆಲ್ಪರ್ ಕೆಲಸಗಳಿಗೆ ಸ್ಥಳೀಯ ಭಾಷೆ ಸಾಕು. 🗣️" },
+      { q: "ಆಫೀಸ್ ಎಲ್ಲಿದೆ?", a: "ನಮ್ಮ ಮುಖ್ಯ ಕಛೇರಿ ಬೆಂಗಳೂರಿನಲ್ಲಿದೆ, ಆದರೆ ಸೇರುವ ಸ್ಥಳ ಕಂಪನಿಯನ್ನು ಅವಲಂಬಿಸಿರುತ್ತದೆ. 🏢" },
+      { q: "India Job Adda ಜೊತೆ ನನ್ನ ವೃತ್ತಿಜೀವನದ ಬೆಳವಣಿಗೆ ಹೇಗಿರುತ್ತದೆ?", a: "ಅತ್ಯುತ್ತಮ! ಅನೇಕರು 6-12 ತಿಂಗಳುಗಳಲ್ಲಿ ಟೀಮ್ ಲೀಡ್ ಆಗುತ್ತಾರೆ! 🚀" }
+    ]
+  },
+  te: {
+    welcome: "నేను **AddaMithra**, మీ జాబ్ అసిస్టెంట్. జాబ్ వెతకడంలో నేను మీకు సహాయం చేస్తాను. 😊\n\nమీ పేరు ఏమిటి?",
+    askPhone: "మిమ్మల్ని కలవడం సంతోషంగా ఉంది {name} 😊\n\n📱 దయచేసి మీ 10-అంకెల మొబైల్ నంబర్‌ను నమోదు చేయండి.",
+    errPhone: "❌ దయచేసి సరైన 10-అంకెల నంబర్‌ను నమోదు చేయండి",
+    askPin: "📍 దయచేసి మీ 6-అంకెల పిన్ కోడ్‌ను నమోదు చేయండి",
+    errPin: "❌ సరైన పిన్ కోడ్ నమోదు చేయండి",
+    pinSuccess: "📍 {district}, {state}",
+    askJob: "💼 మీరు ఎలాంటి ఉద్యోగం కోసం చూస్తున్నారు?",
+    askCity: "📍 మీరు ఎక్కడ పని చేయాలనుకుంటున్నారు?",
+    askExp: "💼 మీకు ఏమైనా పని అనుభవం ఉందా?",
+    askEdu: "🎓 మీ విద్యా అర్హత ఏమిటి?",
+    summary: "✅ **వివరాలు (Summary)**\n\n👤 {name}\n📱 {phone}\n📍 {district}, {state}\n\n💼 {job}\n🏙 {city}\n📊 {exp}\n🎓 {edu}",
+    faqPlaceholder: "ఒక ప్రశ్నను ఎంచుకోండి...",
+    faqs: [
+      { q: "నా ఉద్యోగ స్థలం ఎక్కడ ఉంటుంది?", a: "మీ పిన్ కోడ్ ఆధారంగా స్థలం కేటాయించబడుతుంది! 📍" },
+      { q: "ప్రస్తుతం ఏ ఉద్యోగాలు ఉన్నాయి?", a: "డెలివరీ, BPO, కిచెన్ మరియు హెల్పర్ ఉద్యోగాలు ఉన్నాయి! 💼" },
+      { q: "జీతం ఎంత ఉంటుంది?", a: "పాత్రను బట్టి నెలకు ₹15,000 నుండి ₹30,000 వరకు ఉంటుంది. 💰" },
+      { q: "ఇన్సెంటివ్ (Incentive) ఉంటుందా?", a: "అవును, పనితీరు ఆధారంగా ఇన్సెంటివ్స్ ఉంటాయి! 📈" },
+      { q: "నా రిఫరల్ బోనస్ ఎలా పొందాలి?", a: "మీ స్నేహితుడు జాయిన్ అయ్యి 15 రోజులు పని చేసిన తర్వాత, మీకు బోనస్ వస్తుంది! 🤝" },
+      { q: "జాయినింగ్ కోసం ట్రావెల్ అలవెన్స్ ఉంటుందా?", a: "ఇది కంపెనీపై ఆధారపడి ఉంటుంది, HR మీకు కన్ఫర్మ్ చేస్తారు! 🚆" },
+      { q: "నేను HR ని ఎలా సంప్రదించాలి?", a: "మమ్మల్ని సంప్రదించడానికి కింద ఉన్న WhatsApp లేదా Call బటన్‌లను క్లిక్ చేయండి! 👇" },
+      { q: "కనీస విద్యార్హత ఏమిటి?", a: "10వ తరగతి కంటే తక్కువ, 10వ, 12వ మరియు డిగ్రీ వారికి ఉద్యోగాలు ఉన్నాయి! 🎓" },
+      { q: "ఇంగ్లీష్ తప్పనిసరిగా రావాలా?", a: "అందరికీ కాదు! డెలివరీ మరియు హెల్పర్ ఉద్యోగాలకు స్థానిక భాష వస్తే చాలు. 🗣️" },
+      { q: "ఆఫీస్ ఎక్కడ ఉంది?", a: "మా ప్రధాన కార్యాలయం బెంగళూరులో ఉంది, కానీ జాయినింగ్ లొకేషన్ కంపెనీని బట్టి ఉంటుంది. 🏢" },
+      { q: "India Job Adda తో నా కెరీర్ గ్రోత్ ఎలా ఉంటుంది?", a: "చాలా బాగుంటుంది! చాలా మంది 6-12 నెలల్లో టీమ్ లీడ్ అవుతారు! 🚀" }
+    ]
+  },
+  ta: {
+    welcome: "நான் **AddaMithra**, உங்கள் வேலை உதவியாளர். வேலை தேட நான் உங்களுக்கு உதவுகிறேன். 😊\n\nஉங்கள் பெயர் என்ன?",
+    askPhone: "உங்களை சந்தித்ததில் மகிழ்ச்சி {name} 😊\n\n📱 உங்கள் 10 இலக்க மொபைல் எண்ணை உள்ளிடவும்.",
+    errPhone: "❌ சரியான 10 இலக்க எண்ணை உள்ளிடவும்",
+    askPin: "📍 உங்கள் 6 இலக்க பின்கோடை உள்ளிடவும்",
+    errPin: "❌ சரியான பின்கோடை உள்ளிடவும்",
+    pinSuccess: "📍 {district}, {state}",
+    askJob: "💼 நீங்கள் எந்த வகையான வேலையைத் தேடுகிறீர்கள்?",
+    askCity: "📍 நீங்கள் எங்கு வேலை செய்ய விரும்புகிறீர்கள்?",
+    askExp: "💼 உங்களுக்கு முன் அனுபவம் உள்ளதா?",
+    askEdu: "🎓 உங்கள் கல்வித் தகுதி என்ன?",
+    summary: "✅ **விவரங்கள் (Summary)**\n\n👤 {name}\n📱 {phone}\n📍 {district}, {state}\n\n💼 {job}\n🏙 {city}\n📊 {exp}\n🎓 {edu}",
+    faqPlaceholder: "ஒரு கேள்வியைத் தேர்ந்தெடுக்கவும்...",
+    faqs: [
+      { q: "எனது வேலை இடம் எங்கே?", a: "உங்கள் பின்கோடு அடிப்படையில் இடம் ஒதுக்கப்படும்! 📍" },
+      { q: "தற்போது என்ன வேலைகள் உள்ளன?", a: "டெலிவரி, BPO, சமையலறை மற்றும் உதவியாளர் வேலைகள் உள்ளன! 💼" },
+      { q: "சம்பளம் எவ்வளவு இருக்கும்?", a: "வேலையைப் பொறுத்து மாதம் ₹15,000 முதல் ₹30,000 வரை இருக்கும். 💰" },
+      { q: "ஊக்கத்தொகை (Incentive) உள்ளதா?", a: "ஆம், பல வேலைகளில் செயல்திறன் அடிப்படையில் ஊக்கத்தொகை உண்டு! 📈" },
+      { q: "எனது பரிந்துரை போனஸை (Referral bonus) எவ்வாறு பெறுவது?", a: "உங்கள் நண்பர் சேர்ந்து 15 நாட்கள் வேலை செய்த பிறகு உங்களுக்கு போனஸ் கிடைக்கும்! 🤝" },
+      { q: "சேருவதற்கு பயணப்படி (Travel allowance) உள்ளதா?", a: "இது நிறுவனத்தைப் பொறுத்தது, HR உறுதிப்படுத்துவார்கள்! 🚆" },
+      { q: "நான் எப்படி HR-ஐ தொடர்புகொள்வது?", a: "எங்களை தொடர்புகொள்ள கீழே உள்ள WhatsApp அல்லது Call பட்டனை கிளிக் செய்யவும்! 👇" },
+      { q: "குறைந்தபட்ச கல்வித் தகுதி என்ன?", a: "10ஆம் வகுப்புக்கு கீழ், 10வது, 12வது மற்றும் பட்டதாரிகளுக்கான வேலைகள் உள்ளன! 🎓" },
+      { q: "ஆங்கில அறிவு கட்டாயமா?", a: "அனைவருக்கும் இல்லை! டெலிவரி மற்றும் உதவியாளர் வேலைகளுக்கு உள்ளூர் மொழி மட்டுமே தேவை. 🗣️" },
+      { q: "அலுவலகம் எங்கே உள்ளது?", a: "எங்கள் தலைமை அலுவலகம் பெங்களூரில் உள்ளது, ஆனால் சேரும் இடம் நிறுவனத்தைப் பொறுத்தது. 🏢" },
+      { q: "India Job Adda உடன் எனது தொழில் வளர்ச்சி எப்படி இருக்கும்?", a: "மிகச் சிறப்பு! பலர் 6-12 மாதங்களில் டீம் லீடர் ஆகிறார்கள்! 🚀" }
+    ]
+  },
+  ml: {
+    welcome: "ഞാൻ **AddaMithra**, നിങ്ങളുടെ ജോലി സഹായിയാണ്. ജോലി കണ്ടെത്താൻ ഞാൻ സഹായിക്കാം. 😊\n\nനിങ്ങളുടെ പേരെന്താണ്?",
+    askPhone: "കണ്ടതിൽ സന്തോഷം {name} 😊\n\n📱 നിങ്ങളുടെ 10 അക്ക മൊബൈൽ നമ്പർ നൽകുക.",
+    errPhone: "❌ ദയവായി ശരിയായ 10 അക്ക നമ്പർ നൽകുക",
+    askPin: "📍 നിങ്ങളുടെ 6 അക്ക പിൻ കോഡ് നൽകുക",
+    errPin: "❌ ശരിയായ പിൻ കോഡ് നൽകുക",
+    pinSuccess: "📍 {district}, {state}",
+    askJob: "💼 ഏത് തരത്തിലുള്ള ജോലിയാണ് നിങ്ങൾ അന്വേഷിക്കുന്നത്?",
+    askCity: "📍 നിങ്ങൾക്ക് എവിടെയാണ് ജോലി ചെയ്യേണ്ടത്?",
+    askExp: "💼 നിങ്ങൾക്ക് മുൻപരിചയമുണ്ടോ?",
+    askEdu: "🎓 നിങ്ങളുടെ വിദ്യാഭ്യാസ യോഗ്യത എന്താണ്?",
+    summary: "✅ **വിവരങ്ങൾ (Summary)**\n\n👤 {name}\n📱 {phone}\n📍 {district}, {state}\n\n💼 {job}\n🏙 {city}\n📊 {exp}\n🎓 {edu}",
+    faqPlaceholder: "ഒരു ചോദ്യം തിരഞ്ഞെടുക്കുക...",
+    faqs: [
+      { q: "എന്റെ ജോലി സ്ഥലം എവിടെയായിരിക്കും?", a: "നിങ്ങളുടെ പിൻ കോഡ് അടിസ്ഥാനമാക്കിയാണ് സ്ഥലം തീരുമാനിക്കുന്നത്! 📍" },
+      { q: "ഇപ്പോൾ ഏത് ജോലികളാണ് ലഭ്യമായിട്ടുള്ളത്?", a: "ഡെലിവറി, BPO, കിച്ചൺ, ഹെൽപ്പർ എന്നീ ഒഴിവുകളുണ്ട്! 💼" },
+      { q: "ശമ്പളം എത്രയായിരിക്കും?", a: "ജോലിയുടെ സ്വഭാവമനുസരിച്ച് പ്രതിമാസം ₹15,000 മുതൽ ₹30,000 വരെയായിരിക്കും. 💰" },
+      { q: "ഇൻസെന്റീവ് (Incentive) ഉണ്ടോ?", a: "ഉണ്ട്, മികച്ച പ്രകടനത്തിന് ഇൻസെന്റീവ് ലഭിക്കുന്ന ജോലികളുണ്ട്! 📈" },
+      { q: "എന്റെ റഫറൽ ബോണസ് എങ്ങനെ നേടാം?", a: "നിങ്ങളുടെ സുഹൃത്ത് ജോലിയിൽ പ്രവേശിച്ച് 15 ദിവസം പൂർത്തിയാക്കുമ്പോൾ ബോണസ് ലഭിക്കും! 🤝" },
+      { q: "ജോലിയിൽ ചേരാൻ യാത്രാബത്ത (Travel allowance) ഉണ്ടോ?", a: "ഇത് കമ്പനിയെ ആശ്രയിച്ചിരിക്കും, HR നിങ്ങളെ അറിയിക്കും! 🚆" },
+      { q: "എനിക്ക് എങ്ങനെ HR നെ ബന്ധപ്പെടാം?", a: "ഞങ്ങളെ ബന്ധപ്പെടാൻ താഴെയുള്ള WhatsApp അല്ലെങ്കിൽ Call ബട്ടണുകളിൽ ക്ലിക്ക് ചെയ്യുക! 👇" },
+      { q: "ഏറ്റവും കുറഞ്ഞ വിദ്യാഭ്യാസ യോഗ്യത എന്താണ്?", a: "10-ാം ക്ലാസിൽ താഴെയുള്ളവർക്കും, 10, 12 പാസായവർക്കും ബിരുദധാരികൾക്കും ജോലികളുണ്ട്! 🎓" },
+      { q: "ഇംഗ്ലീഷ് അറിവ് നിർബന്ധമാണോ?", a: "എല്ലാവർക്കും അല്ല! ഡെലിവറി, ഹെൽപ്പർ ജോലികൾക്ക് പ്രാദേശിക ഭാഷ മതിയാകും. 🗣️" },
+      { q: "ഓഫീസ് എവിടെയാണ്?", a: "ഞങ്ങളുടെ പ്രധാന ഓഫീസ് ബെംഗളൂരുവിലാണ്, എന്നാൽ ജോലി സ്ഥലം കമ്പനിയെ ആശ്രയിച്ചിരിക്കും. 🏢" },
+      { q: "India Job Adda വഴി എന്റെ കരിയർ വളർച്ച എങ്ങനെയായിരിക്കും?", a: "വളരെ മികച്ചതായിരിക്കും! പലരും 6-12 മാസത്തിനുള്ളിൽ ടീം ലീഡ് ആയി മാറാറുണ്ട്! 🚀" }
+    ]
+  }
+};
+
+// Set welcome time
+document.getElementById('welcome-time').textContent = getTime();
+document.getElementById('date-chip').textContent = getDateLabel();
+
+function getTime() {
+  const d = new Date();
+  return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+}
+
+function getDateLabel() {
+  return new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' });
+}
+
+function scrollToBottom(force) {
+  chatBg.scrollTop = chatBg.scrollHeight;
+  isAtBottom = true;
+  unreadCount = 0;
+  scrollDownBtn.classList.remove('show');
+  unreadBadge.classList.remove('show');
+}
+
+chatBg.addEventListener('scroll', () => {
+  const threshold = 100;
+  isAtBottom = chatBg.scrollHeight - chatBg.scrollTop - chatBg.clientHeight < threshold;
+  if (isAtBottom) {
+    scrollDownBtn.classList.remove('show');
+    unreadBadge.classList.remove('show');
+    unreadCount = 0;
+  } else {
+    scrollDownBtn.classList.add('show');
+  }
+});
+
+function addBubble(text, sender) {
+  const row = document.createElement('div');
+  row.className = 'row ' + sender;
+  if (sender === 'bot') {
+    const av = document.createElement('div');
+    av.className = 'bot-av';
+    av.textContent = 'AI';
+    row.appendChild(av);
+  }
+  const bub = document.createElement('div');
+  bub.className = 'bubble ' + sender;
+  const formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+  bub.innerHTML = formatted + `<div class="meta"><span class="meta-time">${getTime()}</span>${sender === 'user' ? '<span class="meta-tick">✓✓</span>' : ''}</div>`;
+  row.appendChild(bub);
+  chatBg.appendChild(row);
+  if (isAtBottom) {
+    setTimeout(() => scrollToBottom(), 30);
+  } else if (sender === 'bot') {
+    unreadCount++;
+    unreadBadge.textContent = unreadCount;
+    unreadBadge.classList.add('show');
+    scrollDownBtn.classList.add('show');
+  }
+  return bub;
+}
+
+function showOptionBubbles(options) {
+  const row = document.createElement('div');
+  row.className = 'row bot';
+  const av = document.createElement('div');
+  av.className = 'bot-av'; av.textContent = 'AI'; row.appendChild(av);
+  const wrap = document.createElement('div');
+  wrap.style.display = 'flex'; wrap.style.flexWrap = 'wrap'; wrap.style.gap = '6px';
+  options.forEach(opt => {
+    const btn = document.createElement('div');
+    btn.className = 'chip'; btn.innerText = opt;
+    btn.onclick = () => sendMessage(opt);
+    wrap.appendChild(btn);
+  });
+  row.appendChild(wrap); chatBg.appendChild(row);
+  setTimeout(() => scrollToBottom(), 30);
+}
+
+function showTyping() {
+  const row = document.createElement('div'); row.className = 'row bot'; row.id = 'typing-row';
+  const av = document.createElement('div'); av.className = 'bot-av'; av.textContent = 'AI'; row.appendChild(av);
+  const bub = document.createElement('div'); bub.className = 'typing-bub'; bub.innerHTML = '<span></span><span></span><span></span>'; row.appendChild(bub);
+  chatBg.appendChild(row);
+  if (isAtBottom) setTimeout(() => scrollToBottom(), 30);
+}
+
+function removeTyping() {
+  const r = document.getElementById('typing-row');
+  if (r) r.remove();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function saveLead() {
+  const data = {
+    sessionId: window.userData.sessionId,
+    name: window.userData.name || "",
+    mobile: window.userData.phone || "",
+    role: window.userData.job || "",
+    location: window.userData.city || "",
+    district: window.userData.district || "",
+    state: window.userData.state || "",
+    education: window.userData.education || "",
+    exp: window.userData.experience || ""
+  };
+  fetch("https://script.google.com/macros/s/AKfycbyxfPgO-nFLM4i_72LBnPgxjzCe6XiGsOFfv-sA2R9R07UOXa_Sx-IgCgzAU8riGfC-QA/exec", {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: { "Content-Type": "text/plain;charset=utf-8" }
+  }).catch(err => console.error("Error saving lead:", err));
+}
+
+async function sendMessage(text) {
+  const userText = text || msgInput.value.trim();
+  if (!userText) {
+    msgInput.focus();
+    return;
+  }
+
+  msgInput.value = ''; 
+  msgInput.style.height = 'auto';
+  
+  // Force keyboard to stay open
+  msgInput.focus();
+
+  addBubble(userText, 'user');
+  history.push({ role: 'user', content: userText });
+  statusEl.textContent = 'typing...';
+  showTyping();
+
+  setTimeout(() => {
+    removeTyping();
+
+    if (!window.step) {
+      const txt = userText.toLowerCase();
+      if(txt.includes('hi') || txt.includes('हिं')) currentLang = 'hi';
+      else if(txt.includes('ka') || txt.includes('ಕನ್')) currentLang = 'kn';
+      else if(txt.includes('te') || txt.includes('తెలు')) currentLang = 'te';
+      else if(txt.includes('ta') || txt.includes('தமி')) currentLang = 'ta';
+      else if(txt.includes('ma') || txt.includes('മല')) currentLang = 'ml';
+      else currentLang = 'en';
+
+      t = translations[currentLang];
+      window.userData = {};
+      window.userData.sessionId = Date.now();
+      window.step = 1;
+      addBubble(t.welcome, 'bot');
+    }
+    else if (window.step === 1) {
+      window.userData.name = userText;
+      saveLead();
+      addBubble(t.askPhone.replace('{name}', userText), 'bot');
+      window.step = 2;
+    }
+    else if (window.step === 2) {
+      let phone = userText.replace(/\D/g, '').slice(-10);
+      if (!/^[6-9]\d{9}$/.test(phone)) {
+        addBubble(t.errPhone, 'bot');
+      } else {
+        window.userData.phone = phone;
+        saveLead();
+        addBubble(t.askPin, 'bot');
+        window.step = 3;
+      }
+    }
+    else if (window.step === 3) {
+      let pin = userText.replace(/\D/g, '');
+      if (!/^\d{6}$/.test(pin)) {
+        addBubble(t.errPin, 'bot');
+      } else {
+        fetch(`https://api.postalpincode.in/pincode/${pin}`)
+          .then(res => res.json())
+          .then(data => {
+            removeTyping();
+            if (data[0].Status === "Success") {
+              const post = data[0].PostOffice[0];
+              window.userData.district = post.District;
+              window.userData.state = post.State;
+              saveLead();
+              addBubble(t.pinSuccess.replace('{district}', post.District).replace('{state}', post.State), 'bot');
+              addBubble(t.askJob, 'bot');
+              showOptionBubbles(["Delivery", "BPO", "Kitchen", "Helper"]);
+              window.step = 4;
+            } else {
+              addBubble(t.errPin, 'bot');
+            }
+            statusEl.textContent = 'online';
+          });
+        return; 
+      }
+    }
+    else if (window.step === 4) {
+      window.userData.job = userText;
+      saveLead();
+      addBubble(t.askCity, 'bot');
+      showOptionBubbles(["Bangalore", "Chennai"]);
+      window.step = 5;
+    }
+    else if (window.step === 5) {
+      window.userData.city = userText;
+      saveLead();
+      addBubble(t.askExp, 'bot');
+      showOptionBubbles(["Fresher", "Experienced"]);
+      window.step = 6;
+    }
+    else if (window.step === 6) {
+      window.userData.experience = userText;
+      saveLead();
+      addBubble(t.askEdu, 'bot');
+      showOptionBubbles(["Below 10th", "10th", "12th", "Graduate"]);
+      window.step = 7;
+    }
+    else if (window.step === 7) {
+      window.userData.education = userText;
+      saveLead();
+      let finalSummary = t.summary
+        .replace('{name}', window.userData.name).replace('{phone}', window.userData.phone)
+        .replace('{district}', window.userData.district).replace('{state}', window.userData.state)
+        .replace('{job}', window.userData.job).replace('{city}', window.userData.city)
+        .replace('{exp}', window.userData.experience).replace('{edu}', window.userData.education);
+      addBubble(finalSummary, 'bot');
+      setTimeout(() => showFinalSupportButtons(), 1500);
+      window.step = 0; 
+    }
+
+    statusEl.textContent = 'online';
+    
+    // Ensure keyboard stays up for the next input
+    if (window.step !== 0) {
+       msgInput.focus();
+    }
+  }, 800);
+}
+function toggleMenu() {
+  const m = document.getElementById('menu');
+  m.style.display = m.style.display === 'block' ? 'none' : 'block';
+}
+function openLink(url) { window.open(url, '_blank'); }
+function shareApp() {
+  if (navigator.share) {
+    navigator.share({ title: "India Job Adda", url: "https://hygienebigbites.github.io/jobadda/" });
+  } else {
+    window.open("https://hygienebigbites.github.io/jobadda/", '_blank');
+  }
+}
+function sendChip(text) {
+  document.getElementById('quick-replies').style.display = 'none';
+  sendMessage(text);
+  // Keep focus so the keyboard stays up if the next step is typing (like Name or Phone)
+  msgInput.focus();
+}
+msgInput.addEventListener('input', () => {
+  msgInput.style.height = 'auto';
+  msgInput.style.height = Math.min(msgInput.scrollHeight, 96) + 'px';
+});
+msgInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+});
+
+// This makes the green button work and keeps the keyboard open
+sendBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  sendMessage();
+  msgInput.focus(); 
+});
+
+
+setTimeout(() => msgInput.focus(), 300);
+
+// Force the footer into view when the keyboard pops up
+msgInput.addEventListener('focus', () => {
+  setTimeout(() => {
+    document.getElementById('footer').scrollIntoView(false);
+    chatBg.scrollTop = chatBg.scrollHeight;
+  }, 300); // 300ms gives the phone keyboard time to fully slide up
+});
+
+function showFinalSupportButtons() {
+  const container = document.createElement('div');
+  container.className = 'row bot';
+  container.innerHTML = `
+    <div class="bot-av">AI</div>
+    <div class="bubble bot" style="max-width: 280px; border: 1px solid #e0e0e0;">
+      <div style="margin-bottom: 12px;">
+        <strong style="color: #075E54; font-size: 13px;">1. Support 📞</strong>
+        <div style="display:flex; gap:8px; margin-top: 8px;">
+          <button onclick="window.location.href='tel:+918040092083'" style="flex:1; padding:10px; border-radius:8px; border:1px solid #ddd; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; font-size:12px; font-weight:600;">
+            <img src="https://cdn-icons-png.flaticon.com/512/724/724664.png" width="16"> Call
+          </button>
+          <button onclick="openLink('https://wa.me/919739961735')" style="flex:1; padding:10px; border-radius:8px; border:1px solid #ddd; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; font-size:12px; font-weight:600;">
+            <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" width="16"> WhatsApp
+          </button>
+        </div>
+      </div>
+      <div style="margin-bottom: 12px;">
+        <strong style="color: #075E54; font-size: 13px;">2. Invite Loved Ones 🤝</strong>
+        <button onclick="shareApp()" style="width:100%; margin-top: 8px; padding:10px; border-radius:8px; border:none; background:#25D366; color:#fff; font-weight:bold; cursor:pointer; font-size:13px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          Share IndiaJobAdda
+        </button>
+      </div>
+      <div>
+        <strong style="color: #075E54; font-size: 13px;">3. Follow for Updates 🚀</strong>
+        <div style="display:flex; justify-content:space-around; margin-top: 10px; padding: 5px; background: #f9f9f9; border-radius: 8px;">
+          <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" width="28" onclick="openLink('https://www.facebook.com/share/1Aynw5Xgtz/')" style="cursor:pointer" title="Facebook">
+          <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" width="28" onclick="openLink('https://www.instagram.com/india_jobadda?utm_source=qr&igsh=MThmbmQyOXlkdTljZQ==')" style="cursor:pointer" title="Instagram">
+          <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" width="28" onclick="openLink('https://whatsapp.com/channel/0029VbCLkqcAYlUNzgaSIO2a')" style="cursor:pointer" title="WhatsApp Channel">
+        </div>
+      </div>
+      <div class="meta"><span class="meta-time">${getTime()}</span></div>
+    </div>
+  `;
+  chatBg.appendChild(container);
+  
+  const faqSelect = document.getElementById('faq-dropdown');
+  faqSelect.innerHTML = `<option value="" disabled selected>${t.faqPlaceholder}</option>`;
+  
+  t.faqs.forEach((faq, index) => {
+    const opt = document.createElement('option');
+    opt.value = index; 
+    opt.textContent = faq.q;
+    faqSelect.appendChild(opt);
+  });
+
+  document.getElementById('msg').style.display = 'none';
+  faqSelect.style.display = 'block';
+
+  // Eye-catcher logic
+  faqSelect.classList.add('pulse-animation');
+  const pulseTimer = setTimeout(() => faqSelect.classList.remove('pulse-animation'), 5000);
+  faqSelect.onmousedown = () => {
+    clearTimeout(pulseTimer);
+    faqSelect.classList.remove('pulse-animation');
+  };
+
+  scrollToBottom();
+}
+// --- PASTE THIS AT THE BOTTOM OF YOUR SCRIPT ---
+
+// FAQ Selection Listener - This makes it send automatically
+document.getElementById('faq-dropdown').addEventListener('change', function(e) {
+  const index = e.target.value;
+  if (index === "" || index === null) return;
+  
+  const selectedFaq = t.faqs[index];
+  
+  // 1. Reset dropdown to the placeholder immediately
+  e.target.selectedIndex = 0; 
+
+  // 2. Show the user's question in a bubble
+  addBubble(selectedFaq.q, 'user');
+
+  // 3. Bot responds
+  statusEl.textContent = 'typing...';
+  showTyping();
+
+  setTimeout(() => {
+    removeTyping();
+    statusEl.textContent = 'online';
+
+    const row = document.createElement('div');
+    row.className = 'row bot';
+    row.innerHTML = `
+      <div class="bot-av">AI</div>
+      <div class="bubble bot">
+        ${selectedFaq.a}
+        <div style="display:flex; gap:8px; margin-top: 10px;">
+          <button onclick="window.location.href='tel:+918040092083'" style="flex:1; padding:8px; border-radius:6px; border:1px solid #ddd; background:#fff; cursor:pointer; font-size:12px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:6px;">
+            <img src="https://cdn-icons-png.flaticon.com/512/724/724664.png" width="14"> Call
+          </button>
+          <button onclick="openLink('https://wa.me/919739961735')" style="flex:1; padding:8px; border-radius:6px; border:1px solid #ddd; background:#fff; cursor:pointer; font-size:12px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:6px;">
+            <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" width="14"> WhatsApp
+          </button>
+        </div>
+        <div class="meta"><span class="meta-time">${getTime()}</span></div>
+      </div>
+    `;
+    
+    chatBg.appendChild(row);
+    scrollToBottom();
+  }, 800);
+});
+</script>
+
+
+</body>
+</html>
