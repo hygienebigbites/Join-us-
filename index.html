@@ -366,6 +366,12 @@ x  <!DOCTYPE html>
 }
   .chip:hover { background: #e8f5e9; border-color: var(--wa-bright-green); }
 
+  /* ── Typewriter + option pop-in ── */
+  .chip-pop { opacity: 0; transform: translateY(6px) scale(0.96); animation: chipPop 0.28s ease-out forwards; }
+  @keyframes chipPop { to { opacity: 1; transform: translateY(0) scale(1); } }
+  .tw-caret::after { content: '▍'; color: var(--wa-muted); margin-left: 1px; animation: caretBlink 0.8s steps(1) infinite; }
+  @keyframes caretBlink { 50% { opacity: 0; } }
+
   /* ── Scroll to Bottom ── */
   #scroll-down {
     position: absolute;
@@ -776,6 +782,35 @@ const translations = {
 document.getElementById('welcome-time').textContent = getTime();
 document.getElementById('date-chip').textContent = getDateLabel();
 
+// ───────── Welcome message: typing dots → typed text → language options ─────────
+window.addEventListener('DOMContentLoaded', function animateWelcome() {
+  const welcomeRow = chatBg.querySelector('.row.bot');
+  const welcomeBub = welcomeRow && welcomeRow.querySelector('.bubble.bot');
+  const quick = document.getElementById('quick-replies');
+  if (!welcomeBub || !quick) return;
+  const meta = welcomeBub.querySelector('.meta');
+  if (meta) meta.remove();
+  const html = welcomeBub.innerHTML.trim();
+  welcomeBub.innerHTML = '';
+  const body = document.createElement('span');
+  welcomeBub.appendChild(body);
+  welcomeRow.style.display = 'none';
+  quick.style.visibility = 'hidden';
+  enqueueBot(async () => {
+    statusEl.textContent = 'typing...';
+    showTyping();
+    await wait(skipTyping ? 0 : 700);
+    removeTyping();
+    welcomeRow.style.display = '';
+    await typeInto(body, html);
+    if (meta) welcomeBub.appendChild(meta);
+    await wait(200);
+    quick.querySelectorAll('.chip').forEach((c, i) => { c.classList.add('chip-pop'); c.style.animationDelay = (i * 70) + 'ms'; });
+    quick.style.visibility = '';
+    scrollToBottom();
+  });
+});
+
 function getTime() {
   const d = new Date();
   return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
@@ -806,6 +841,11 @@ chatBg.addEventListener('scroll', () => {
 });
 
 function addBubble(text, sender) {
+  // Bot messages: queued + typed out letter by letter (options wait for it)
+  if (sender === 'bot') {
+    enqueueBot(() => addBotBubbleTyped(text));
+    return null;
+  }
   const row = document.createElement('div');
   row.className = 'row ' + sender;
   if (sender === 'bot') {
@@ -832,6 +872,11 @@ function addBubble(text, sender) {
 }
 
 function showOptionBubbles(options) {
+  // Options appear only after the previous bot message finished typing
+  enqueueBot(() => renderOptionBubbles(options));
+}
+
+function renderOptionBubbles(options) {
   const row = document.createElement('div');
   row.className = 'row bot';
   const av = document.createElement('div');
@@ -840,7 +885,8 @@ function showOptionBubbles(options) {
   wrap.style.display = 'flex'; wrap.style.flexWrap = 'wrap'; wrap.style.gap = '6px';
   options.forEach(opt => {
     const btn = document.createElement('div');
-    btn.className = 'chip'; btn.innerText = opt;
+    btn.className = 'chip chip-pop'; btn.innerText = opt;
+    btn.style.animationDelay = (wrap.children.length * 70) + 'ms';
     btn.onclick = () => sendMessage(opt);
     wrap.appendChild(btn);
   });
@@ -860,6 +906,86 @@ function removeTyping() {
   const r = document.getElementById('typing-row');
   if (r) r.remove();
 }
+
+// ───────── Typewriter engine ─────────
+// All bot output goes through one queue so messages and options always appear in order.
+let botQueue = Promise.resolve();
+let botBusy = 0;          // number of pending bot tasks
+let skipTyping = false;   // tap on chat = finish current message instantly
+
+function enqueueBot(fn) {
+  botBusy++;
+  botQueue = botQueue
+    .then(() => fn())
+    .catch(err => console.error('Bot render error:', err))
+    .finally(() => { botBusy--; if (!botBusy) skipTyping = false; });
+  return botQueue;
+}
+
+function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// Split HTML into tags (added whole) and visible letters (added one by one).
+// Uses grapheme segmentation so emojis and Indian-language letters don't break.
+function tokenizeHtml(html) {
+  const tokens = [];
+  const seg = (typeof Intl !== 'undefined' && Intl.Segmenter) ? new Intl.Segmenter(undefined, { granularity: 'grapheme' }) : null;
+  html.split(/(<[^>]+>|&[a-zA-Z#0-9]+;)/).forEach(part => {
+    if (!part) return;
+    if (part[0] === '<' || (part[0] === '&' && part.endsWith(';'))) { tokens.push({ t: part, tag: part[0] === '<' }); return; }
+    const chars = seg ? Array.from(seg.segment(part), s => s.segment) : Array.from(part);
+    chars.forEach(c => tokens.push({ t: c, tag: false }));
+  });
+  return tokens;
+}
+
+async function typeInto(el, html) {
+  const tokens = tokenizeHtml(html);
+  const visible = tokens.filter(x => !x.tag).length || 1;
+  // Short messages type a bit slower, long ones faster (≈ 2 sec max)
+  const delay = Math.max(8, Math.min(28, 2000 / visible));
+  statusEl.textContent = 'typing...';
+  el.classList.add('tw-caret');
+  let out = '';
+  for (let i = 0; i < tokens.length; i++) {
+    out += tokens[i].t;
+    if (tokens[i].tag) continue;
+    if (skipTyping) { out = tokens.map(x => x.t).join(''); break; }
+    el.innerHTML = out;
+    if (isAtBottom && i % 4 === 0) chatBg.scrollTop = chatBg.scrollHeight;
+    await wait(delay);
+  }
+  el.innerHTML = out;
+  el.classList.remove('tw-caret');
+  statusEl.textContent = 'online';
+}
+
+async function addBotBubbleTyped(text) {
+  const row = document.createElement('div');
+  row.className = 'row bot';
+  const av = document.createElement('div');
+  av.className = 'bot-av'; av.textContent = 'AI';
+  row.appendChild(av);
+  const bub = document.createElement('div');
+  bub.className = 'bubble bot';
+  const body = document.createElement('span');
+  bub.appendChild(body);
+  row.appendChild(bub);
+  chatBg.appendChild(row);
+  if (!isAtBottom) {
+    unreadCount++;
+    unreadBadge.textContent = unreadCount;
+    unreadBadge.classList.add('show');
+    scrollDownBtn.classList.add('show');
+  }
+  const formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+  await typeInto(body, formatted);
+  bub.insertAdjacentHTML('beforeend', `<div class="meta"><span class="meta-time">${getTime()}</span></div>`);
+  if (isAtBottom) scrollToBottom();
+  await wait(250); // small pause before options pop in
+}
+
+// Tap anywhere in the chat to finish the current message instantly
+chatBg.addEventListener('click', () => { if (botBusy) skipTyping = true; });
 
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -893,11 +1019,14 @@ async function sendMessage(text) {
     return;
   }
 
-  msgInput.value = ''; 
+  msgInput.value = '';
   msgInput.style.height = 'auto';
-  
+
   // Force keyboard to stay open
   msgInput.focus();
+
+  // If the bot is still typing, finish it instantly so the chat order stays correct
+  if (botBusy) { skipTyping = true; await botQueue; }
 
   addBubble(userText, 'user');
   history.push({ role: 'user', content: userText });
@@ -995,7 +1124,8 @@ async function sendMessage(text) {
         .replace('{job}', window.userData.job).replace('{city}', window.userData.city)
         .replace('{exp}', window.userData.experience).replace('{edu}', window.userData.education);
       addBubble(finalSummary, 'bot');
-      setTimeout(() => showFinalSupportButtons(), 1500);
+      // Support card appears after the summary has finished typing
+      enqueueBot(() => wait(600).then(showFinalSupportButtons));
       window.step = 0; 
     }
 
@@ -1014,9 +1144,9 @@ function toggleMenu() {
 function openLink(url) { window.open(url, '_blank'); }
 function shareApp() {
   if (navigator.share) {
-    navigator.share({ title: "India Job Adda", url: "https://hygienebigbites.github.io/jobadda/" });
+    navigator.share({ title: "India Job Adda", url: "https://hygienebigbites.github.io/Join-us-/" });
   } else {
-    window.open("https://hygienebigbites.github.io/jobadda/", '_blank');
+    window.open("https://hygienebigbites.github.io/Join-us-/", '_blank');
   }
 }
 function sendChip(text) {
@@ -1132,14 +1262,14 @@ document.getElementById('faq-dropdown').addEventListener('change', function(e) {
   setTimeout(() => {
     removeTyping();
     statusEl.textContent = 'online';
-
+    enqueueBot(async () => {
     const row = document.createElement('div');
     row.className = 'row bot';
     row.innerHTML = `
       <div class="bot-av">AI</div>
       <div class="bubble bot">
-        ${selectedFaq.a}
-        <div style="display:flex; gap:8px; margin-top: 10px;">
+        <span class="faq-answer"></span>
+        <div class="faq-actions" style="display:none; gap:8px; margin-top: 10px;">
           <button onclick="window.location.href='tel:+918040092083'" style="flex:1; padding:8px; border-radius:6px; border:1px solid #ddd; background:#fff; cursor:pointer; font-size:12px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:6px;">
             <img src="https://cdn-icons-png.flaticon.com/512/724/724664.png" width="14"> Call
           </button>
@@ -1147,12 +1277,20 @@ document.getElementById('faq-dropdown').addEventListener('change', function(e) {
             <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" width="14"> WhatsApp
           </button>
         </div>
-        <div class="meta"><span class="meta-time">${getTime()}</span></div>
+        <div class="meta" style="display:none;"><span class="meta-time">${getTime()}</span></div>
       </div>
     `;
-    
+
     chatBg.appendChild(row);
     scrollToBottom();
+    // Type the answer, then pop in Call / WhatsApp buttons
+    await typeInto(row.querySelector('.faq-answer'), selectedFaq.a);
+    const actions = row.querySelector('.faq-actions');
+    actions.style.display = 'flex';
+    actions.querySelectorAll('button').forEach((b, i) => { b.classList.add('chip-pop'); b.style.animationDelay = (i * 80) + 'ms'; });
+    row.querySelector('.meta').style.display = '';
+    scrollToBottom();
+    });
   }, 800);
 });
 </script>
